@@ -1,0 +1,15 @@
+# Local smoke test on the M1: a handful of items, two languages, the three pass-1 cells.
+# Purpose: read every output by eye before anything runs at scale.
+name: local_smoke
+model: Qwen/Qwen3-0.6B-Base
+backend: hf
+dtype: float16
+max_new_tokens: 256
+batch_size: 5
+
+languages: [de, sw]
+cells: [direct, native_cot, en_cot]
+exemplar_set: native
+n_shot: 6
+n_items: 5            # first 5 of 250; null = all
+output: results/local_smoke.jsonl

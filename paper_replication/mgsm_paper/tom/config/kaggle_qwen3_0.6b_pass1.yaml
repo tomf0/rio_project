@@ -1,0 +1,15 @@
+# Pass 1, smallest model: Table 3 core cells, all 11 languages, all 250 items.
+# 3 x 2,750 = 8,250 generations. Runs on Kaggle with vLLM (see kaggle/README.md).
+name: qwen3_0.6b_base_pass1
+model: Qwen/Qwen3-0.6B-Base
+backend: vllm
+dtype: float16
+max_new_tokens: 256
+batch_size: 250        # vLLM schedules internally; one call per (language, cell)
+
+languages: [en, de, fr, es, ru, zh, ja, th, te, bn, sw]
+cells: [direct, native_cot, en_cot]
+exemplar_set: native
+n_shot: 6
+n_items: null
+output: results/kaggle/qwen3_0.6b_base_pass1.jsonl
