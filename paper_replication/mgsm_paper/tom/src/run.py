@@ -38,6 +38,7 @@ class RunConfig:
     n_shot: int
     n_items: int | None  # None = all 250
     output: str
+    max_model_len: int = 8192  # vllm only; optional in the YAML
 
     @classmethod
     def from_yaml(cls, path: str | Path, overrides: list[str] = ()) -> "RunConfig":
@@ -57,7 +58,8 @@ class RunConfig:
 
     def gen_config(self) -> GenConfig:
         return GenConfig(model=self.model, backend=self.backend, dtype=self.dtype,
-                         max_new_tokens=self.max_new_tokens, batch_size=self.batch_size)
+                         max_new_tokens=self.max_new_tokens, batch_size=self.batch_size,
+                         max_model_len=self.max_model_len)
 
 
 def load_done(path: Path) -> set[tuple[str, str, int]]:

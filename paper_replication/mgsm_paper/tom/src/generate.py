@@ -26,7 +26,7 @@ class GenConfig:
     backend: str = "hf"  # "hf" | "vllm"
     dtype: str = "float16"  # matches the Kaggle T4, which has no bfloat16
     max_new_tokens: int = 256  # DIRECT needs ~5; CoT solutions in the exemplars are < 100
-    max_model_len: int = 4096  # vllm only: longest prompt + completion it will accept
+    max_model_len: int = 8192  # vllm only: longest prompt + completion. Telugu 6-shot prompts reach 4,243 tokens.
     batch_size: int = 8  # prompts per forward pass; lower if memory is tight
 
 
