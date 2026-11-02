@@ -103,7 +103,7 @@ def run(cfg: RunConfig) -> None:
                     prompts = [builder.build(it, spec) for it in batch]
                     gens = backend.generate(prompts, stops)
                     for item, prompt, gen in zip(batch, prompts, gens):
-                        ex = extract_answer(gen.text, solution_language(cell, lang), cell)
+                        ex = extract_answer(gen.text, solution_language(cell, lang), cell, question_lang=lang)
                         correct = is_correct(ex.value, item.answer)
                         n_correct += bool(correct)
                         row = {

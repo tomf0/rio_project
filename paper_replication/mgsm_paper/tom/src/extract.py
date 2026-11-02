@@ -23,9 +23,9 @@ def normalise_digits(text: str) -> str:
             out.append(ch)
     return "".join(out)
 
-# optional minus, digits, optional thousands groups ("1,800", "114 200"), optional decimals.
-# Known ambiguity, accepted: German dot-thousands ("2.125") reads as a decimal.
-NUMBER = r"-?\d+(?:[ ,]\d{3})*(?:\.\d+)?"
+# optional minus, digits, optional thousands groups ("1,800", "114 200", "12.000"),
+# optional decimals. Dot-thousands (German style) is resolved in to_number().
+NUMBER = r"-?\d+(?:[ ,.]\d{3})*(?:\.\d+)?"
 NUMBER_RE = re.compile(NUMBER)
 
 # Characters allowed between the closing phrase and the number: whitespace,
@@ -54,29 +54,40 @@ CLOSING_PHRASE_RE = {
     for lang, phrase in _PHRASE.items()
 }
 
+# Only digits in groups of three separated by dots ("12.000", "1.234.567"): a dot-thousands number.
+_DOT_THOUSANDS = re.compile(r"^-?\d{1,3}(?:\.\d{3})+$")
+
+
 def to_number(text: str) -> int | float:
-    """'1,800' -> 1800, '114 200' -> 114200, '18.0' -> 18, '2.5' -> 2.5."""
-    value = float(text.replace(",", "").replace(" ", ""))
+    """'1,800' -> 1800, '114 200' -> 114200, '12.000' -> 12000, '18.0' -> 18, '2.5' -> 2.5."""
+    text = text.replace(",", "").replace(" ", "")
+    if _DOT_THOUSANDS.match(text):
+        text = text.replace(".", "")
+    value = float(text)
     return int(value) if value.is_integer() else value
 
 @dataclass(frozen=True)
 class Extraction:
     value: int | float | None   # None = nothing numeric found
-    method: str | None          # "closing_phrase" | "first_number" | "last_number" | None
+    method: str | None          # "closing_phrase" | "closing_phrase_native" | "first_number" | "last_number" | None
 
-def extract_answer(completion: str, solution_lang: str, cell: str) -> Extraction:
+def extract_answer(completion: str, solution_lang: str, cell: str, question_lang: str | None = None) -> Extraction:
     """Find the model's final answer in one completion.
 
     completion     the generated text, already truncated at the stop sequence
     solution_lang  language the SOLUTION was requested in ("en" for en_cot,
                    the item language for native_cot and direct)
     cell           "direct" | "native_cot" | "en_cot"
+    question_lang  language of the question; used only when it differs from
+                   solution_lang (i.e. en_cot on a non-English item)
 
     Rules, in order:
       direct cell   the completion should be just the number, so take the FIRST
                     number. (A base model may ramble after it; the first is the answer.)
-      cot cells     1. the LAST occurrence of the closing phrase followed by a number;
-                    2. else the LAST number anywhere (recorded as a fallback).
+      cot cells     1. the LAST closing phrase in solution_lang, then its number;
+                    2. the LAST closing phrase in question_lang (the model slipped
+                       into the question's language), recorded separately;
+                    3. else the LAST number anywhere (recorded as a fallback).
     """
     text = normalise_digits(completion)
 
@@ -86,9 +97,14 @@ def extract_answer(completion: str, solution_lang: str, cell: str) -> Extraction
             return Extraction(to_number(match.group(0)), "first_number")
         return Extraction(None, None)
 
-    phrase_hits = CLOSING_PHRASE_RE[solution_lang].findall(text)
-    if phrase_hits:
-        return Extraction(to_number(phrase_hits[-1]), "closing_phrase")
+    hits = CLOSING_PHRASE_RE[solution_lang].findall(text)
+    if hits:
+        return Extraction(to_number(hits[-1]), "closing_phrase")
+
+    if question_lang is not None and question_lang != solution_lang:
+        hits = CLOSING_PHRASE_RE[question_lang].findall(text)
+        if hits:
+            return Extraction(to_number(hits[-1]), "closing_phrase_native")
 
     numbers = NUMBER_RE.findall(text)
     if numbers:

@@ -18,6 +18,15 @@ def test_to_number_handles_separators_and_integral_decimals():
     assert to_number("-3") == -3
 
 
+def test_to_number_reads_dot_thousands_as_thousands():
+    # German style, which the model copies even in English completions.
+    assert to_number("12.000") == 12000
+    assert to_number("100.000") == 100000
+    assert to_number("1.234.567") == 1234567
+    assert to_number("1,234.56") == 1234.56  # comma-thousands with a real decimal is untouched
+    assert to_number("1234.5") == 1234.5  # four leading digits: not a thousands pattern
+
+
 def test_every_exemplar_solution_is_extracted_via_its_closing_phrase():
     # 88 model-perfect completions: the phrase rule must fire and give the gold answer.
     for lang in LANGUAGES:
@@ -46,6 +55,23 @@ def test_phrase_variants_and_junk():
     assert extract_answer("The answer is: **$2,125**.", "en", "en_cot").value == 2125
     assert extract_answer("答えは１８個です。", "ja", "native_cot").value == 18
     assert extract_answer("คำตอบคือ ๑๘", "th", "native_cot").value == 18
+
+
+def test_dot_thousands_in_a_completion():
+    assert extract_answer("Der Gewinn ist 12.000 US-Dollar. Die Antwort ist 12.000.", "de", "native_cot").value == 12000
+    assert extract_answer("The answer is 52.000.", "en", "en_cot").value == 52000
+    assert extract_answer(" 100.000 US-Dollar", "de", "direct").value == 100000
+
+
+def test_en_cot_falls_back_to_the_question_language_phrase():
+    completion = "Das ergibt 2 + 1/2 = 5 Knäuel. Die Antwort ist 5."
+    got = extract_answer(completion, "en", "en_cot", question_lang="de")
+    assert (got.value, got.method) == (5, "closing_phrase_native")
+    # without question_lang the old behaviour remains: last number
+    assert extract_answer(completion, "en", "en_cot").method == "last_number"
+    # the English phrase still wins when present
+    both = "Die Antwort ist 5. The answer is 3."
+    assert extract_answer(both, "en", "en_cot", question_lang="de").value == 3
 
 
 def test_fallback_to_last_number_is_recorded():
