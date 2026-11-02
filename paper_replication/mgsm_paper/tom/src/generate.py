@@ -28,6 +28,7 @@ class GenConfig:
     max_new_tokens: int = 256  # DIRECT needs ~5; CoT solutions in the exemplars are < 100
     max_model_len: int = 8192  # vllm only: longest prompt + completion. Telugu 6-shot prompts reach 4,243 tokens.
     batch_size: int = 8  # prompts per forward pass; lower if memory is tight
+    tensor_parallel: int = 1  # vllm only: GPUs to shard the model across (2 for the 8B on Kaggle's 2xT4)
 
 
 @dataclass(frozen=True)
@@ -109,7 +110,8 @@ class VLLMBackend:
         from vllm import LLM
 
         self.cfg = cfg
-        self.llm = LLM(model=cfg.model, dtype=cfg.dtype, max_model_len=cfg.max_model_len, gpu_memory_utilization=0.90)
+        self.llm = LLM(model=cfg.model, dtype=cfg.dtype, max_model_len=cfg.max_model_len,
+                       gpu_memory_utilization=0.90, tensor_parallel_size=cfg.tensor_parallel)
         self.tokenizer = self.llm.get_tokenizer()
         print(f"[vllm] {cfg.model} in {cfg.dtype}, max_model_len {cfg.max_model_len}", flush=True)
 

@@ -1,0 +1,16 @@
+# Pass 1, third model: Table 3 core cells, all 11 languages, all 250 items.
+# max_new_tokens raised to 768 after the 0.6B run truncated 85% of Telugu and 59% of
+# Bengali NATIVE-COT completions at 256 (those scripts cost 3-6x the tokens of English).
+name: qwen3_4b_base_pass1
+model: Qwen/Qwen3-4B-Base
+backend: vllm
+dtype: float16
+max_new_tokens: 768
+batch_size: 250
+
+languages: [en, de, fr, es, ru, zh, ja, th, te, bn, sw]
+cells: [direct, native_cot, en_cot]
+exemplar_set: native
+n_shot: 6
+n_items: null
+output: results/kaggle/qwen3_4b_base_pass1.jsonl

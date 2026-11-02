@@ -58,6 +58,15 @@ MGSM languages. Qwen2.5 was the alternative (narrower language coverage).
 Given the two-week deadline (Section 7), pass 1 runs 0.6B and 1.7B. 4B and 8B are stretch
 goals, decided after the 1.7B results are in; without them C5 is a two-point curve.
 
+Prediction recorded 2026-11-02, before the 1.7B/4B/8B runs. Yong et al. (2025, "Crosslingual
+Reasoning through Test-Time Scaling", arXiv:2505.05408) report few-shot MGSM baselines for
+Qwen2.5-Instruct at 1.5B/3B/7B/14B/32B (their Tables 1, 4-7). Native-CoT Swahili goes
+3.2 / 9.6 / 18.4 / 46.8 / 57.2 and Telugu 1.6 / 9.6 / 20.8 / 53.2 / 59.6 across those sizes.
+Their 1.5B row matches our 0.6B result closely (sw 2.0, te 3.2, bn 14.4). So: C4 (small
+HRL-URL gap) is expected to FAIL at every size we can run on free compute, and only to appear
+at 14B or above; C5 (monotone improvement with scale) is expected to hold. A 14B run would
+need a 4-bit quantised base checkpoint on one T4, a documented confound.
+
 float16 on Kaggle. The 7-8B model needs either the 2xT4 Kaggle instance with vLLM tensor
 parallelism or a 4-bit quantised checkpoint on one T4; quantisation is a confound to note.
 Instruct checkpoints of the same sizes are an optional secondary run, not part of the plan.
