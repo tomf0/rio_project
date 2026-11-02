@@ -7,5 +7,5 @@ CLAUDE.md
 CLAUDE.local.md
 .claude/
 sandbox/
-analysis/out/
+**/analysis/out/
 paper_replication/**/results/kaggle/
