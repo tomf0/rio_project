@@ -8,3 +8,4 @@ CLAUDE.local.md
 .claude/
 sandbox/
 analysis/out/
+paper_replication/**/results/kaggle/

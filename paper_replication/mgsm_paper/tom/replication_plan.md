@@ -156,6 +156,13 @@ first.
   smallest sizes, 3-5 hours for the 4B, 6-10 hours for the 8B on 2xT4. Run smallest first;
   the runner must resume from a partial JSONL.
 - Translation step (Section 2) is a one-off manual task, about an afternoon.
+- Results files: Kaggle JSONL outputs (~33 MB per model) are kept local, not committed
+  (decided 2026-11-02); the Kaggle notebook's Output tab holds the zips.
+
+Run log:
+- 2026-11-02: Qwen3-0.6B-Base pass 1 complete (vLLM, one T4, ~30 min). max_new_tokens 256
+  truncated 85% of Telugu, 59% of Bengali and 24% of Thai NATIVE-COT completions; reported as
+  is, with the truncation rates alongside. 1.7B runs with max_new_tokens 768.
 
 ## 8. Decisions still open
 
