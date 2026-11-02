@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 
 from .data import load_mgsm
-from .extract import extract_answer, is_correct
+from .extract import Extraction, extract_answer, is_correct
 from .generate import GenConfig, make_backend
 from .prompts import PromptBuilder, PromptSpec
 
@@ -103,7 +103,11 @@ def run(cfg: RunConfig) -> None:
                     prompts = [builder.build(it, spec) for it in batch]
                     gens = backend.generate(prompts, stops)
                     for item, prompt, gen in zip(batch, prompts, gens):
-                        ex = extract_answer(gen.text, solution_language(cell, lang), cell, question_lang=lang)
+                        try:
+                            ex = extract_answer(gen.text, solution_language(cell, lang), cell, question_lang=lang)
+                        except Exception as err:  # one odd completion must never kill the run
+                            print(f"[run] extraction error on {lang} {cell} item {item.item_id}: {err!r}", flush=True)
+                            ex = Extraction(None, "error")
                         correct = is_correct(ex.value, item.answer)
                         n_correct += bool(correct)
                         row = {
