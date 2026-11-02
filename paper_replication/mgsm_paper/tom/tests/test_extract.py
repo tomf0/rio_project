@@ -27,6 +27,14 @@ def test_to_number_reads_dot_thousands_as_thousands():
     assert to_number("1234.5") == 1234.5  # four leading digits: not a thousands pattern
 
 
+def test_to_number_never_raises_on_regex_matchable_shapes():
+    # These shapes match NUMBER but are not valid floats; the first Kaggle run died on one.
+    assert to_number("1.234.56") == 1234.56
+    assert to_number("12.000.5") == 12000.5
+    assert to_number("1.234.5") == 1234.5
+    assert extract_answer("Das sind 1.234.56 Euro. Die Antwort ist 1.234.56.", "de", "native_cot").value == 1234.56
+
+
 def test_every_exemplar_solution_is_extracted_via_its_closing_phrase():
     # 88 model-perfect completions: the phrase rule must fire and give the gold answer.
     for lang in LANGUAGES:

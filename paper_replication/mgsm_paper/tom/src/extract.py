@@ -59,10 +59,18 @@ _DOT_THOUSANDS = re.compile(r"^-?\d{1,3}(?:\.\d{3})+$")
 
 
 def to_number(text: str) -> int | float:
-    """'1,800' -> 1800, '114 200' -> 114200, '12.000' -> 12000, '18.0' -> 18, '2.5' -> 2.5."""
+    """'1,800' -> 1800, '114 200' -> 114200, '12.000' -> 12000, '18.0' -> 18, '2.5' -> 2.5.
+
+    Mixed shapes the regex can also match, like '1.234.56', read all dots but the last
+    as thousands separators: 1234.56. Must never raise: the runner calls this on every
+    model completion.
+    """
     text = text.replace(",", "").replace(" ", "")
     if _DOT_THOUSANDS.match(text):
         text = text.replace(".", "")
+    elif text.count(".") > 1:
+        head, _, tail = text.rpartition(".")  # split at the LAST dot
+        text = head.replace(".", "") + "." + tail
     value = float(text)
     return int(value) if value.is_integer() else value
 
