@@ -165,6 +165,11 @@ first.
   smallest sizes, 3-5 hours for the 4B, 6-10 hours for the 8B on 2xT4. Run smallest first;
   the runner must resume from a partial JSONL.
 - Translation step (Section 2) is a one-off manual task, about an afternoon.
+- 8B prediction, recorded 2026-11-03 before the run, from the 0.6B/1.7B/4B trend
+  (NATIVE-COT AVG 31.7 / 53.4 / 69.9; URL 12.6 / 33.6 / 54.8; gap 27 / 29 / 22):
+  AVG 77, HRL 83, URL 66, gap 17; en 90, te 64, bn 74, sw 40. EN-COT ahead by ~1 overall
+  and 3-5 on URL. C4 still fails (gap > 10) but narrowing. Surprises would be sw > 45 or
+  the gap not narrowing.
 - Results files: Kaggle JSONL outputs (~33 MB per model) are kept local, not committed
   (decided 2026-11-02); the Kaggle notebook's Output tab holds the zips.
 
