@@ -1,0 +1,17 @@
+# Pass 2b (paper Table 4): MULTILINGUAL exemplars, one each from en/de/fr/es/ru/zh (Figure 6 order).
+# max_new_tokens raised to 768 after the 0.6B run truncated 85% of Telugu and 59% of
+# Bengali NATIVE-COT completions at 256 (those scripts cost 3-6x the tokens of English).
+name: qwen3_8b_base_pass2_multilingual
+model: Qwen/Qwen3-8B-Base
+backend: vllm
+dtype: float16
+max_new_tokens: 768
+batch_size: 250
+tensor_parallel: 2   # 8B in float16 is ~16 GB: needs both Kaggle T4s
+
+languages: [en, de, fr, es, ru, zh, ja, th, te, bn, sw]
+cells: [native_cot, en_cot]
+exemplar_set: multilingual
+n_shot: 6
+n_items: null
+output: results/kaggle/qwen3_8b_base_pass2_multilingual.jsonl
