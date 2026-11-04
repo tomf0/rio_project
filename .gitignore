@@ -9,3 +9,4 @@ CLAUDE.local.md
 sandbox/
 **/analysis/out/
 paper_replication/**/results/kaggle/
+paper_replication/**/data/mgsm_translate_en/output/
