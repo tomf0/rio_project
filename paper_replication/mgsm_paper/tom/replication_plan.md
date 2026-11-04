@@ -170,6 +170,10 @@ first.
   AVG 77, HRL 83, URL 66, gap 17; en 90, te 64, bn 74, sw 40. EN-COT ahead by ~1 overall
   and 3-5 on URL. C4 still fails (gap > 10) but narrowing. Surprises would be sw > 45 or
   the gap not narrowing.
+  Actual (2026-11-04): AVG 75.8, HRL 80.7, URL 65.2, gap 15.5; en 88.4, te 64.0, bn 72.8,
+  sw 44.8. Every number within 2.3 of the prediction except Swahili (+4.8, the one flagged
+  surprise direction). EN-COT gap 11.7. C4 still fails on the native cell (> 10) but is
+  within noise of the threshold on EN-COT.
 - Results files: Kaggle JSONL outputs (~33 MB per model) are kept local, not committed
   (decided 2026-11-02); the Kaggle notebook's Output tab holds the zips.
 
