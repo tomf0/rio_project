@@ -178,6 +178,14 @@ first.
   (decided 2026-11-02); the Kaggle notebook's Output tab holds the zips.
 
 Run log:
+- 2026-11-06: pass 2 (Table 4 exemplar variants) complete for all four sizes, one Kaggle run
+  of 32,000 generations. C6: multilingual exemplars beat English-only by 2-3 points at every
+  size (paper: 16), concentrated in URL (8B: +7 URL, te +17, sw +6; HRL slightly favours
+  English exemplars). PaLM's NATIVE-COT+multilingual collapse (fr 7.2, es 10.4) does NOT
+  replicate: 8B fr 81.2, es 85.2, compliance 99.4%. New finding: EN-COT with English-only
+  exemplars gets 13% compliance at 8B: the model writes the solution in the QUESTION's
+  language 87% of the time; exemplars teach the question-to-solution language mapping, not
+  the output language. Accuracy cost of that drift is 3.4 points overall, 9 on URL.
 - 2026-11-02: Qwen3-0.6B-Base pass 1 complete (vLLM, one T4, ~30 min). max_new_tokens 256
   truncated 85% of Telugu, 59% of Bengali and 24% of Thai NATIVE-COT completions; reported as
   is, with the truncation rates alongside. 1.7B runs with max_new_tokens 768.
