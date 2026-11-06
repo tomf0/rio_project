@@ -147,7 +147,11 @@ def main(argv: list[str]) -> None:
     if not argv:
         sys.exit("usage: python -m analysis.analyse results/<file>.jsonl [more.jsonl ...]")
     df = load(argv)
-    run_name = df["run"].iloc[0]
+    # Output folder named after every run in the input, so pass-1-only and pass-1+pass-2
+    # analyses of the same model never overwrite each other:
+    #   qwen3_8b_base_pass1  vs  qwen3_8b_base_pass1+pass2_english+pass2_multilingual
+    runs = list(dict.fromkeys(df["run"]))  # unique, in file order
+    run_name = runs[0] + "".join("+" + r.split("_base_", 1)[-1] for r in runs[1:])
     out_dir = Path("analysis/out") / run_name
     out_dir.mkdir(parents=True, exist_ok=True)
 
